@@ -18,46 +18,38 @@ socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
 
-radius = 1
-radiusUpdate = False
+params = 1
+updateParams = False
 seconds = 0.01
 
 #this will pass to the viewer every "seconds" 
 def background_thread():
 	"""Example of how to send server generated events to clients."""
-	global radius, radiusUpdate
+	global params, updateParams
 	count = 0
 	while True:
 		socketio.sleep(seconds)
-		if (radiusUpdate):
-			print("========= radius=",radius)
-			socketio.emit('update_params',
-						  {'radius': radius},
-						  namespace='/test')
-		radiusUpdate = False
+		if (updateParams):
+			print("========= params:",params)
+			socketio.emit('update_params', params, namespace='/test')
+		updateParams = False
 
 #testing the connection
 @socketio.on('connection_test', namespace='/test')
 def connection_test(message):
 	session['receive_count'] = session.get('receive_count', 0) + 1
-	emit('connection_response',
-		 {'data': message['data'], 'count': session['receive_count']})
+	emit('connection_response',{'data': message['data'], 'count': session['receive_count']})
 
-@socketio.on('connect', namespace='/test')
-def test_connect():
-	emit('my_response', {'data': 'Connected', 'count': 0})
 
-#will receive data from gui
+#will receive data from gui (and print to console as a test within "from_gui")
 @socketio.on('gui_input', namespace='/test')
 def gui_input(message):
-	global radius, radiusUpdate
-	radiusUpdate = True
-	session['receive_count'] = session.get('receive_count', 0) + 1
-	radius = message['data']
-	emit('from_gui',
-		 {'data': message['data'], 'count': session['receive_count']})
+	global params, updateParams
+	updateParams = True
+	params = message
+	emit('from_gui',message)
 
-
+#the background task sends data to the viewer
 @socketio.on('connect', namespace='/test')
 def from_gui():
 	global thread
@@ -73,14 +65,10 @@ def viewer():
 
 @app.route("/gui")
 def gui(): 
-	args = request.args
-	print("========  testing", args, file=sys.stderr) 
 	return render_template("gui.html")
 
 @app.route("/gui")
 def getGUIdata():
-	args = request.args
-	print("========  testing", args, file=sys.stderr) 
 	return args
 
 if __name__ == "__main__":

@@ -1,2 +1,18 @@
 # FlaskTest
-A simple test with python flask and webgl to separate the vis and gui
+A simple test with python flask, socket-io, and webgl to separate the vis and gui
+
+## To Run
+
+```
+$ python app.py
+```
+
+Then open two browser windows.  The gui lives in:
+
+http://localhost:5000/gui
+
+The viewer lives in:
+
+http://localhost:5000/viewer
+
+Change the values on the gui sliders, and watch the viewer update.

@@ -1,8 +1,8 @@
 //https://blog.miguelgrinberg.com/post/easy-websockets-with-flask-and-gevent
 //https://github.com/miguelgrinberg/Flask-SocketIO
 function connectSocketOutput(){
-	$(document).ready(function() {
-
+	//$(document).ready(function() {
+	document.addEventListener("DOMContentLoaded", function(event) { 
 		// Event handler for new connections.
 		// The callback function is invoked when a connection with the
 		// server is established.
@@ -11,15 +11,13 @@ function connectSocketOutput(){
 		});
 		internalParams.socket.on('connection_response', function(msg) {
 			console.log(msg);
-		});		// Event handler for server sent data.
+		});		
+		// Event handler for server sent data.
 		// The callback function is invoked whenever the server emits data
 		// to the client. The data is then displayed in the "Received"
 		// section of the page.
 		internalParams.socket.on('from_gui', function(msg) {
-			if (msg.data ){
-				console.log(msg);
-			}
-
+			//console.log(msg);
 		});
 	});
 }

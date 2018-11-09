@@ -52,11 +52,8 @@ function defineInternalParams(){
 }
 
 
-
-
-
 function setURLvars(){
-	internalParams.socket.emit('gui_input', {data: externalParams.radius})
+	internalParams.socket.emit('gui_input', externalParams)
 	var keys = Object.keys(externalParams);
 	var vars = "/gui?" //this needs to be the same as what is in flask
 	keys.forEach(function(k) {

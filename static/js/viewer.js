@@ -8,7 +8,8 @@ function setParams(vars){
 //https://blog.miguelgrinberg.com/post/easy-websockets-with-flask-and-gevent
 //https://github.com/miguelgrinberg/Flask-SocketIO
 function connectSocketInput(){
-	$(document).ready(function() {
+	//$(document).ready(function() {
+	document.addEventListener("DOMContentLoaded", function(event) { 
 		// Event handler for new connections.
 		// The callback function is invoked when a connection with the
 		// server is established.
