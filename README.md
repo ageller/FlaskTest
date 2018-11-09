@@ -7,11 +7,11 @@ A simple test with python flask, socket-io, and webgl to separate the vis and gu
 $ python app.py
 ```
 
-Then open two browser windows.  The gui lives in:
+Then open two browser windows.  The gui lives here:
 
 http://localhost:5000/gui
 
-The viewer lives in:
+The viewer lives here:
 
 http://localhost:5000/viewer
 
