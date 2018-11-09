@@ -19,41 +19,51 @@ thread = None
 thread_lock = Lock()
 
 radius = 1
+radiusUpdate = False
+seconds = 0.01
 
+#this will pass to the viewer every "seconds" 
 def background_thread():
 	"""Example of how to send server generated events to clients."""
-	global radius
+	global radius, radiusUpdate
 	count = 0
 	while True:
-		socketio.sleep(1)
-		print("========= radius=",radius)
-		count += 0.1
-		socketio.emit('my_response',
-					  {'radius': radius},
-					  namespace='/test')
+		socketio.sleep(seconds)
+		if (radiusUpdate):
+			print("========= radius=",radius)
+			socketio.emit('update_params',
+						  {'radius': radius},
+						  namespace='/test')
+		radiusUpdate = False
 
+#testing the connection
 @socketio.on('connection_test', namespace='/test')
 def connection_test(message):
 	session['receive_count'] = session.get('receive_count', 0) + 1
-	emit('my_response',
-		 {'data': message['data'], 'count': session['receive_count']})
-
-#will receive data from gui
-@socketio.on('gui_event', namespace='/test')
-def gui_event(message):
-	global radius
-	session['receive_count'] = session.get('receive_count', 0) + 1
-	radius = message['data']
-	emit('my_response',
+	emit('connection_response',
 		 {'data': message['data'], 'count': session['receive_count']})
 
 @socketio.on('connect', namespace='/test')
 def test_connect():
+	emit('my_response', {'data': 'Connected', 'count': 0})
+
+#will receive data from gui
+@socketio.on('gui_input', namespace='/test')
+def gui_input(message):
+	global radius, radiusUpdate
+	radiusUpdate = True
+	session['receive_count'] = session.get('receive_count', 0) + 1
+	radius = message['data']
+	emit('from_gui',
+		 {'data': message['data'], 'count': session['receive_count']})
+
+
+@socketio.on('connect', namespace='/test')
+def from_gui():
 	global thread
 	with thread_lock:
 		if thread is None:
 			thread = socketio.start_background_task(target=background_thread)
-	emit('my_response', {'data': 'Connected', 'count': 0})
 ##############
 
 
