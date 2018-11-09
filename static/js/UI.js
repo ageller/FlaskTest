@@ -1,31 +1,3 @@
-function updateURL(){
-	console.log("/?"+obj.name+"="+obj.value)
-	window.history.pushState(obj, obj.name, "/?"+obj.name+"="+obj.value);
-}
-
-function updateURLradius() {
-
-	var form = document.createElement("form");
-	form.action = "http://localhost:8082";   
-	form.style.display = "none";
-	
-	var element = document.createElement("input"); 
-	element.name = "radius";
-	element.value = externalParams.radius;
-	element.type = "text"
-
-	var submit = document.createElement("input"); 
-	submit.type = "submit"
-
-	form.appendChild(element);  
-	form.appendChild(submit);  
-	document.body.appendChild(form);
-
-	form.submit();
-
-	console.log(externalParams.radius)
-}
-
 function setURLvars(){
 	var keys = Object.keys(externalParams);
 	var vars = "/"
