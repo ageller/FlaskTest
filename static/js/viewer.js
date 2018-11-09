@@ -12,8 +12,7 @@ function defineExternalParams(){
 		this.thetaStart = 0;
 		this.thetaLength = Math.PI;
 
-		//for gui
-		this.gui = null;
+
 	};
 
 
@@ -32,25 +31,25 @@ function defineInternalParams(){
 		this.zmin = 1;
 		this.fov = 45.
 
-
+		//for gui
+		this.gui = null;
 
 		//for sphere
 		this.sphere;
 		this.material = null;
 
-		this.drawSphere = function(){
-			//sphere geometry
-			if (internalParams.sphere != null){
-				internalParams.scene.remove(internalParams.sphere);
-			}
-			var geometry = new THREE.SphereGeometry(externalParams.radius, externalParams.widthSegments, externalParams.heightSegments, externalParams.phiStart, externalParams.phiLength, externalParams.thetaStart, externalParams.thetaLength)
-			internalParams.sphere = new THREE.Mesh( geometry, internalParams.material );
-			internalParams.scene.add( internalParams.sphere );
-		}
 	};
-
-
 }
+
+function drawSphere(){
+	//sphere geometry
+	if (internalParams.sphere != null){
+		internalParams.scene.remove(internalParams.sphere);
+	}
+	var geometry = new THREE.SphereGeometry(externalParams.radius, externalParams.widthSegments, externalParams.heightSegments, externalParams.phiStart, externalParams.phiLength, externalParams.thetaStart, externalParams.thetaLength)
+	internalParams.sphere = new THREE.Mesh( geometry, internalParams.material );
+	internalParams.scene.add( internalParams.sphere );
+};
 
 //this initializes everything needed for the scene
 function init(){
@@ -92,7 +91,7 @@ function drawScene(){
 
 	//draw the sphere
 	internalParams.material = new THREE.MeshPhongMaterial( { color: 0x156289, emissive: 0x072534, side: THREE.DoubleSide, flatShading: true } );
-	internalParams.drawSphere();
+	drawSphere();
 
 	//lights
 	var lights = [];
@@ -110,6 +109,44 @@ function drawScene(){
 
 
 }
+function setParams(vars){
+	var keys = Object.keys(vars);
+	keys.forEach(function(k){
+		externalParams[k] = parseFloat(vars[k])
+	});
+	drawSphere()
+}
+
+//https://blog.miguelgrinberg.com/post/easy-websockets-with-flask-and-gevent
+//https://github.com/miguelgrinberg/Flask-SocketIO
+function connectSocket(){
+	$(document).ready(function() {
+		// Use a "/test" namespace.
+		// An application can open a connection on multiple namespaces, and
+		// Socket.IO will multiplex all those connections on a single
+		// physical channel. If you don't care about multiple channels, you
+		// can set the namespace to an empty string.
+		namespace = '/test';
+		// Connect to the Socket.IO server.
+		// The connection URL has the following format:
+		//     http[s]://<domain>:<port>[/<namespace>]
+		var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+		// Event handler for new connections.
+		// The callback function is invoked when a connection with the
+		// server is established.
+		socket.on('connect', function() {
+			socket.emit('my_event', {data: 'I\'m connected!'});
+		});
+		// Event handler for server sent data.
+		// The callback function is invoked whenever the server emits data
+		// to the client. The data is then displayed in the "Received"
+		// section of the page.
+		socket.on('my_response', function(msg) {
+			setParams(msg);
+		});
+	});
+}
+
 
 //this is the animation loop
 function animate(time) {
@@ -129,7 +166,7 @@ function WebGLStart(){
 	init();
 
 //create the UI
-	//createUI();
+	//createGUI();
 
 //draw everything
 	drawScene();
