@@ -1,30 +1,27 @@
-function setURLvars(){
-	var keys = Object.keys(externalParams);
-	var vars = "/gui?" //this needs to be the same as what is in flask
-	keys.forEach(function(k) {
-		if (k != "gui"){
-			vars += k+"="+externalParams[k]+"&";
-		}
-	});
-	window.history.pushState("externalParams", "updated", vars);
-}
+//https://blog.miguelgrinberg.com/post/easy-websockets-with-flask-and-gevent
+//https://github.com/miguelgrinberg/Flask-SocketIO
+function connectSocketOutput(){
+	$(document).ready(function() {
 
-//https://html-online.com/articles/get-url-parameters-javascript/
-function getURLvars() {
-    var vars = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-        vars[key] = value;
-    });
-    return vars;
-}
+		// Event handler for new connections.
+		// The callback function is invoked when a connection with the
+		// server is established.
+		internalParams.socket.on('connect', function() {
+			internalParams.socket.emit('connection_test', {data: 'I\'m connected!'});
+		});
+		// Event handler for server sent data.
+		// The callback function is invoked whenever the server emits data
+		// to the client. The data is then displayed in the "Received"
+		// section of the page.
+		internalParams.socket.on('my_response', function(msg) {
+			if (msg.data ){
+				console.log(msg);
+			}
 
-function setParamsFromURL(){
-	var vars = getURLvars();
-	var keys = Object.keys(vars);
-	keys.forEach(function(k){
-		externalParams[k] = parseFloat(vars[k])
+		});
 	});
 }
+
 //this creates the user interface (gui)
 function createGUI(){
 	setParamsFromURL();

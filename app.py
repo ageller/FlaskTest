@@ -18,20 +18,32 @@ socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
 
+radius = 1
 
 def background_thread():
 	"""Example of how to send server generated events to clients."""
+	global radius
 	count = 0
 	while True:
-		socketio.sleep(0.01)
-		count += 0.01
+		socketio.sleep(1)
+		print("========= radius=",radius)
+		count += 0.1
 		socketio.emit('my_response',
-					  {'radius': np.sin(count % (2.*np.pi))},
+					  {'radius': radius},
 					  namespace='/test')
 
-@socketio.on('my_event', namespace='/test')
-def test_message(message):
+@socketio.on('connection_test', namespace='/test')
+def connection_test(message):
 	session['receive_count'] = session.get('receive_count', 0) + 1
+	emit('my_response',
+		 {'data': message['data'], 'count': session['receive_count']})
+
+#will receive data from gui
+@socketio.on('gui_event', namespace='/test')
+def gui_event(message):
+	global radius
+	session['receive_count'] = session.get('receive_count', 0) + 1
+	radius = message['data']
 	emit('my_response',
 		 {'data': message['data'], 'count': session['receive_count']})
 
@@ -42,7 +54,6 @@ def test_connect():
 		if thread is None:
 			thread = socketio.start_background_task(target=background_thread)
 	emit('my_response', {'data': 'Connected', 'count': 0})
-
 ##############
 
 

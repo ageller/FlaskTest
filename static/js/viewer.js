@@ -1,46 +1,34 @@
-//all "global" variables are contained within params object
-var externalParams;
-function defineExternalParams(){
-	externalParams = new function() {
-
-		//for sphere
-		this.radius = 5.;
-		this.widthSegments = 32;
-		this.heightSegments = 32;
-		this.phiStart = 0;
-		this.phiLength = 2.*Math.PI;
-		this.thetaStart = 0;
-		this.thetaLength = Math.PI;
-
-
-	};
-
-
+function setParams(vars){
+	var keys = Object.keys(vars);
+	keys.forEach(function(k){
+		externalParams[k] = parseFloat(vars[k])
+	});
+	drawSphere()
 }
+//https://blog.miguelgrinberg.com/post/easy-websockets-with-flask-and-gevent
+//https://github.com/miguelgrinberg/Flask-SocketIO
+function connectSocketInput(){
+	$(document).ready(function() {
+		// Event handler for new connections.
+		// The callback function is invoked when a connection with the
+		// server is established.
+		internalParams.socket.on('connect', function() {
+			internalParams.socket.emit('connection_test', {data: 'I\'m connected!'});
+		});
+		// Event handler for server sent data.
+		// The callback function is invoked whenever the server emits data
+		// to the client. The data is then displayed in the "Received"
+		// section of the page.
+		internalParams.socket.on('my_response', function(msg) {
+			if (msg.data ){
+				console.log(msg);
+			}else{
+				setParams(msg);
+			}
 
-var internalParams;
-function defineInternalParams(){
-	internalParams = new function() {
-
-		this.container = null;
-		this.renderer = null;
-		this.scene = null;
-
-		//for frustum      
-		this.zmax = 5.e10;
-		this.zmin = 1;
-		this.fov = 45.
-
-		//for gui
-		this.gui = null;
-
-		//for sphere
-		this.sphere;
-		this.material = null;
-
-	};
+		});
+	});
 }
-
 function drawSphere(){
 	//sphere geometry
 	if (internalParams.sphere != null){
@@ -108,43 +96,6 @@ function drawScene(){
 	})
 
 
-}
-function setParams(vars){
-	var keys = Object.keys(vars);
-	keys.forEach(function(k){
-		externalParams[k] = parseFloat(vars[k])
-	});
-	drawSphere()
-}
-
-//https://blog.miguelgrinberg.com/post/easy-websockets-with-flask-and-gevent
-//https://github.com/miguelgrinberg/Flask-SocketIO
-function connectSocket(){
-	$(document).ready(function() {
-		// Use a "/test" namespace.
-		// An application can open a connection on multiple namespaces, and
-		// Socket.IO will multiplex all those connections on a single
-		// physical channel. If you don't care about multiple channels, you
-		// can set the namespace to an empty string.
-		namespace = '/test';
-		// Connect to the Socket.IO server.
-		// The connection URL has the following format:
-		//     http[s]://<domain>:<port>[/<namespace>]
-		var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-		// Event handler for new connections.
-		// The callback function is invoked when a connection with the
-		// server is established.
-		socket.on('connect', function() {
-			socket.emit('my_event', {data: 'I\'m connected!'});
-		});
-		// Event handler for server sent data.
-		// The callback function is invoked whenever the server emits data
-		// to the client. The data is then displayed in the "Received"
-		// section of the page.
-		socket.on('my_response', function(msg) {
-			setParams(msg);
-		});
-	});
 }
 
 

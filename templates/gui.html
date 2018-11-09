@@ -2,22 +2,27 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Three.js Sphere UI Test</title>
-
+		<title>Three.js Sphere GUI Test</title>
+		<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
 	</head>
 	<body style="margin:0; padding:0; overflow:hidden">
+
+		<!-- three.js -->
+		<script src="/static/js/lib/three.min.js"></script>
 
 		<!-- dat.gui -->
 		<script src="/static/js/lib/dat.gui.js"></script>
 
 		<!-- my script -->
+		<script src="/static/js/utils.js"></script>
 		<script src="/static/js/gui.js"></script>
-		<script src="/static/js/viewer.js"></script>
 		<script>
 			//define the params object (from render.js)
 			defineInternalParams();
 			defineExternalParams();
 			createGUI();	
+			connectSocketOutput();
 		</script>
 	</body>
 </html>
