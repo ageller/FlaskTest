@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Three.js Sphere UI Test</title>
+
+	</head>
+	<body style="margin:0; padding:0; overflow:hidden">
+
+		<!-- dat.gui -->
+		<script src="/static/js/lib/dat.gui.js"></script>
+
+		<!-- my script -->
+		<script src="/static/js/UI.js"></script>
+		<script src="/static/js/render.js"></script>
+		<script>
+			//define the params object (from render.js)
+			defineInternalParams();
+			defineExternalParams();
+			createUI();	
+		</script>
+	</body>
+</html>
