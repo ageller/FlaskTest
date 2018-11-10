@@ -26,6 +26,19 @@ function connectSocketInput(){
 		internalParams.socket.on('update_params', function(msg) {
 			setParams(msg);
 		});
+		internalParams.socket.on('update_camera', function(msg) {
+			internalParams.camera.position.x = msg.position.x;
+			internalParams.camera.position.y = msg.position.y;
+			internalParams.camera.position.z = msg.position.z;
+
+			internalParams.camera.rotation.x = msg.rotation.x;
+			internalParams.camera.rotation.y = msg.rotation.y;
+			internalParams.camera.rotation.z = msg.rotation.z;
+
+			internalParams.camera.up.x = msg.up.x;
+			internalParams.camera.up.y = msg.up.y;
+			internalParams.camera.up.z = msg.up.z;
+		});
 	});
 }
 function drawSphere(){
@@ -38,43 +51,9 @@ function drawSphere(){
 	internalParams.scene.add( internalParams.sphere );
 };
 
-//this initializes everything needed for the scene
-function init(){
-
-	var screenWidth = window.innerWidth;
-	var screenHeight = window.innerHeight;
-	var aspect = screenWidth / screenHeight;
-
-	// renderer
-	internalParams.renderer = new THREE.WebGLRenderer( {
-		antialias:true,
-	} );
-	internalParams.renderer.setSize(screenWidth, screenHeight);
-
-	internalParams.container = document.getElementById('WebGLContainer');
-	internalParams.container.appendChild( internalParams.renderer.domElement );
-
-	// scene
-	internalParams.scene = new THREE.Scene();     
-
-	// camera
-	internalParams.camera = new THREE.PerspectiveCamera( internalParams.fov, aspect, internalParams.zmin, internalParams.zmax);
-	internalParams.camera.up.set(0, -1, 0);
-	internalParams.camera.position.z = 30;
-	internalParams.scene.add(internalParams.camera);  
-
-	// events
-	THREEx.WindowResize(internalParams.renderer, internalParams.camera);
-
-	//controls
-	internalParams.controls = new THREE.TrackballControls( internalParams.camera, internalParams.renderer.domElement );
-
-
-}
-
 
 //this will draw the scene (with lighting)
-function drawScene(){
+function drawViewer(){
 
 	//draw the sphere
 	internalParams.material = new THREE.MeshPhongMaterial( { color: 0x156289, emissive: 0x072534, side: THREE.DoubleSide, flatShading: true } );
@@ -99,30 +78,30 @@ function drawScene(){
 
 
 //this is the animation loop
-function animate(time) {
-	requestAnimationFrame( animate );
+function animateViewer(time) {
+	requestAnimationFrame( animateViewer );
 	internalParams.controls.update();
 	internalParams.renderer.render( internalParams.scene, internalParams.camera );
 }
 
 //this is called to start everything
-function WebGLStart(){
+function startViewer(){
 
-//define the params object
+//define the params objects
 	defineInternalParams();
 	defineExternalParams();
 
-//initialize everything
-	init();
+//initialize everything related to the WebGL scene
+	initScene();
 
 //create the UI
 	//createGUI();
 
 //draw everything
-	drawScene();
+	drawViewer();
 
 //begin the animation
-	animate();
+	animateViewer();
 }
 
 

@@ -18,20 +18,29 @@ socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
 
+#global variables to hold the params and camera
 params = 1
 updateParams = False
+camera = {}
+updateCamera = False
+
+#number of seconds between updates
 seconds = 0.01
 
 #this will pass to the viewer every "seconds" 
 def background_thread():
 	"""Example of how to send server generated events to clients."""
-	global params, updateParams
+	global params, updateParams, camera, updateCamera
 	while True:
 		socketio.sleep(seconds)
 		if (updateParams):
 			print("========= params:",params)
 			socketio.emit('update_params', params, namespace='/test')
+		if (updateCamera):
+			#print("========= camera:",camera)
+			socketio.emit('update_camera', camera, namespace='/test')
 		updateParams = False
+		updateCamera = False
 
 #testing the connection
 @socketio.on('connection_test', namespace='/test')
@@ -47,6 +56,13 @@ def gui_input(message):
 	updateParams = True
 	params = message
 	emit('from_gui',message)
+
+#will receive data from camera 
+@socketio.on('camera_input', namespace='/test')
+def camera_input(message):
+	global camera, updateCamera
+	updateCamera = True
+	camera = message
 
 #the background task sends data to the viewer
 @socketio.on('connect', namespace='/test')
@@ -71,7 +87,8 @@ def getGUIdata():
 	return args
 
 if __name__ == "__main__":
-	socketio.run(app, debug=True)
+	socketio.run(app, debug=True)#, host='0.0.0.0')
+	#app.run(host='0.0.0.0')
 
 
 

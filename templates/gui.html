@@ -6,12 +6,17 @@
 	</head>
 	<body style="margin:0; padding:0; overflow:hidden">
 
+		<!-- This will contain the canvas -->
+		<div id="WebGLContainer" ></div>
+
 		<!-- socket.io -->
 		<script src="/static/js/lib/socket.io.min.js"></script>
 
-		<!-- three.js -->
+		<!-- three.js resources -->
 		<script src="/static/js/lib/three.min.js"></script>
-
+		<script src="/static/js/lib/TrackballControls.js"></script>
+		<script src="/static/js/lib/THREEx.WindowResize.js"></script>
+		
 		<!-- dat.gui -->
 		<script src="/static/js/lib/dat.gui.js"></script>
 
@@ -19,10 +24,8 @@
 		<script src="/static/js/utils.js"></script>
 		<script src="/static/js/gui.js"></script>
 		<script>
-			//define the params object (from render.js)
-			defineInternalParams();
-			defineExternalParams();
-			createGUI();	
+			//called upon loading
+			startGUI();
 			connectSocketOutput();
 		</script>
 	</body>

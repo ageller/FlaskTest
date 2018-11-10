@@ -29,14 +29,73 @@ function createGUI(){
 
 
 	internalParams.gui = new dat.GUI();
-	internalParams.gui.add( externalParams, 'radius', 1,30).onChange(setURLvars);
-	internalParams.gui.add( externalParams, 'widthSegments', 3,32).onChange(setURLvars);
-	internalParams.gui.add( externalParams, 'heightSegments', 3,32).onChange(setURLvars);
-	internalParams.gui.add( externalParams, 'phiStart', 0.,2.*Math.PI).onChange(setURLvars);
-	internalParams.gui.add( externalParams, 'phiLength', 0.,2.*Math.PI).onChange(setURLvars);
-	internalParams.gui.add( externalParams, 'thetaStart', 0.,2.*Math.PI).onChange(setURLvars);
-	internalParams.gui.add( externalParams, 'thetaLength', 0.,2.*Math.PI).onChange(setURLvars);
+	internalParams.gui.add( externalParams, 'radius', 1,30).onChange(sendGUIinfo);
+	internalParams.gui.add( externalParams, 'widthSegments', 3,32).onChange(sendGUIinfo);
+	internalParams.gui.add( externalParams, 'heightSegments', 3,32).onChange(sendGUIinfo);
+	internalParams.gui.add( externalParams, 'phiStart', 0.,2.*Math.PI).onChange(sendGUIinfo);
+	internalParams.gui.add( externalParams, 'phiLength', 0.,2.*Math.PI).onChange(sendGUIinfo);
+	internalParams.gui.add( externalParams, 'thetaStart', 0.,2.*Math.PI).onChange(sendGUIinfo);
+	internalParams.gui.add( externalParams, 'thetaLength', 0.,2.*Math.PI).onChange(sendGUIinfo);
 
+}
+
+function sendGUIinfo(){
+	//send the information from the GUI back to the flask app, and then on to the viewer
+	internalParams.socket.emit('gui_input', externalParams);
+
+	//this is to update the URL (not really needed here)
+	setURLvars()
+}
+function drawCube(){
+	var size = 1.;
+	// CUBE
+	var geometry = new THREE.CubeGeometry(size, size, size);
+	var cubeMaterials = [ 
+		new THREE.MeshBasicMaterial({color:"yellow", side: THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({color:"orange", side: THREE.DoubleSide}), 
+		new THREE.MeshBasicMaterial({color:"red", side: THREE.DoubleSide}),
+		new THREE.MeshBasicMaterial({color:"green", side: THREE.DoubleSide}), 
+		new THREE.MeshBasicMaterial({color:"blue", side: THREE.DoubleSide}), 
+		new THREE.MeshBasicMaterial({color:"purple", side: THREE.DoubleSide}), 
+	]; 
+	// Create a MeshFaceMaterial, which allows the cube to have different materials on each face 
+	var cubeMaterial = new THREE.MeshFaceMaterial(cubeMaterials); 
+	var cube = new THREE.Mesh(geometry, cubeMaterial);
+
+
+	internalParams.scene.add( cube );
+}
+
+//this is the animation loop
+function animateGUI(time) {
+	requestAnimationFrame( animateGUI );
+	internalParams.controls.update();
+
+	//send the controls back to the flask app, and then on to the viewer
+	internalParams.socket.emit('camera_input',{
+		"position":internalParams.camera.position,
+		"rotation":internalParams.camera.rotation,
+		"up":internalParams.camera.up
+	});
+	internalParams.renderer.render( internalParams.scene, internalParams.camera );
+}
+
+function startGUI(){
+//define the params object
+	defineInternalParams();
+	defineExternalParams();
+
+//initialize everything related to the WebGL scene
+	initScene();
+
+//create the UI
+	createGUI();
+
+//draw the cube
+	drawCube();	
+
+//begin the animation
+	animateGUI();
 }
 
 

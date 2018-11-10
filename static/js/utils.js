@@ -51,19 +51,6 @@ function defineInternalParams(){
 	};
 }
 
-
-function setURLvars(){
-	internalParams.socket.emit('gui_input', externalParams)
-	var keys = Object.keys(externalParams);
-	var vars = "/gui?" //this needs to be the same as what is in flask
-	keys.forEach(function(k) {
-		if (k != "gui"){
-			vars += k+"="+externalParams[k]+"&";
-		}
-	});
-	window.history.pushState("externalParams", "updated", vars);
-}
-
 //https://html-online.com/articles/get-url-parameters-javascript/
 function getURLvars() {
 	var vars = {};
@@ -80,3 +67,50 @@ function setParamsFromURL(){
 		externalParams[k] = parseFloat(vars[k])
 	});
 }
+
+//this initializes everything needed for the scene
+function initScene(){
+
+	var screenWidth = window.innerWidth;
+	var screenHeight = window.innerHeight;
+	var aspect = screenWidth / screenHeight;
+
+	// renderer
+	internalParams.renderer = new THREE.WebGLRenderer( {
+		antialias:true,
+	} );
+	internalParams.renderer.setSize(screenWidth, screenHeight);
+
+	internalParams.container = document.getElementById('WebGLContainer');
+	internalParams.container.appendChild( internalParams.renderer.domElement );
+
+	// scene
+	internalParams.scene = new THREE.Scene();     
+
+	// camera
+	internalParams.camera = new THREE.PerspectiveCamera( internalParams.fov, aspect, internalParams.zmin, internalParams.zmax);
+	internalParams.camera.up.set(0, -1, 0);
+	internalParams.camera.position.z = 30;
+	internalParams.scene.add(internalParams.camera);  
+
+	// events
+	THREEx.WindowResize(internalParams.renderer, internalParams.camera);
+
+	//controls
+	internalParams.controls = new THREE.TrackballControls( internalParams.camera, internalParams.renderer.domElement );
+
+
+}
+
+function setURLvars(){
+	var keys = Object.keys(externalParams);
+	var vars = "/gui?" //this needs to be the same as what is in flask
+	keys.forEach(function(k) {
+		if (k != "gui"){
+			vars += k+"="+externalParams[k]+"&";
+		}
+	});
+	window.history.pushState("externalParams", "updated", vars);
+}
+
+
