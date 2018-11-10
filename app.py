@@ -5,6 +5,7 @@ from threading import Lock
 import sys
 import numpy as np
 
+
 app = Flask(__name__)
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
@@ -19,11 +20,11 @@ thread = None
 thread_lock = Lock()
 
 #global variables to hold the params and camera
-params = 1
+params = None
 updateParams = False
-camera = {}
+camera = None
 updateCamera = False
-controls = {}
+controls = None
 updateControls = False
 
 #number of seconds between updates
@@ -59,7 +60,7 @@ def gui_input(message):
 	global params, updateParams
 	updateParams = True
 	params = message
-	emit('from_gui',message)
+	#emit('from_gui',message)
 
 #will receive data from camera 
 @socketio.on('camera_input', namespace='/test')
@@ -84,7 +85,7 @@ def from_gui():
 			thread = socketio.start_background_task(target=background_thread)
 ##############
 
-
+#flask stuff
 @app.route("/viewer")
 def viewer():  
 	return render_template("viewer.html")
@@ -93,9 +94,6 @@ def viewer():
 def gui(): 
 	return render_template("gui.html")
 
-@app.route("/gui")
-def getGUIdata():
-	return args
 
 if __name__ == "__main__":
 	socketio.run(app, debug=True)#, host='0.0.0.0')

@@ -13,6 +13,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
+	//added by AMG to track when controls are changing
+	this.changed = false;
+
 	// API
 
 	this.enabled = true;
@@ -321,8 +324,10 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_this.object.lookAt( _this.target );
 
+		_this.changed = false;
 		if ( lastPosition.distanceToSquared( _this.object.position ) > EPS ) {
 
+			_this.changed = true;
 			_this.dispatchEvent( changeEvent );
 
 			lastPosition.copy( _this.object.position );

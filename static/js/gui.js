@@ -70,18 +70,20 @@ function drawCube(){
 function animateGUI(time) {
 	requestAnimationFrame( animateGUI );
 	internalParams.controls.update();
-
-	//send the camera info back to the flask app, and then on to the viewer
-	internalParams.socket.emit('camera_input',{
-		"position":internalParams.camera.position,
-		"rotation":internalParams.camera.rotation,
-		"up":internalParams.camera.up
-	});
-	//send the controls infro back to the flask app, and then on to the viewer
-	internalParams.socket.emit('controls_input',{
-		"target":internalParams.controls.target,
-	});
 	internalParams.renderer.render( internalParams.scene, internalParams.camera );
+	
+	//send the camera info back to the flask app, and then on to the viewer
+	if (internalParams.controls.changed){
+		internalParams.socket.emit('camera_input',{
+			"position":internalParams.camera.position,
+			"rotation":internalParams.camera.rotation,
+			"up":internalParams.camera.up
+		});
+		//send the controls infro back to the flask app, and then on to the viewer
+		internalParams.socket.emit('controls_input',{
+			"target":internalParams.controls.target,
+		});
+	}
 }
 
 function startGUI(){
