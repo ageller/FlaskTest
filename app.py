@@ -23,6 +23,8 @@ params = 1
 updateParams = False
 camera = {}
 updateCamera = False
+controls = {}
+updateControls = False
 
 #number of seconds between updates
 seconds = 0.01
@@ -30,17 +32,19 @@ seconds = 0.01
 #this will pass to the viewer every "seconds" 
 def background_thread():
 	"""Example of how to send server generated events to clients."""
-	global params, updateParams, camera, updateCamera
+	global params, updateParams, camera, updateCamera, controls, updateControls
 	while True:
 		socketio.sleep(seconds)
 		if (updateParams):
 			print("========= params:",params)
 			socketio.emit('update_params', params, namespace='/test')
 		if (updateCamera):
-			#print("========= camera:",camera)
 			socketio.emit('update_camera', camera, namespace='/test')
+		if (updateControls):
+			socketio.emit('update_controls', controls, namespace='/test')
 		updateParams = False
 		updateCamera = False
+		updateControls = False
 
 #testing the connection
 @socketio.on('connection_test', namespace='/test')
@@ -63,6 +67,13 @@ def camera_input(message):
 	global camera, updateCamera
 	updateCamera = True
 	camera = message
+
+#will receive data from controls 
+@socketio.on('controls_input', namespace='/test')
+def controls(message):
+	global controls, updateControls
+	updateControls = True
+	controls = message
 
 #the background task sends data to the viewer
 @socketio.on('connect', namespace='/test')

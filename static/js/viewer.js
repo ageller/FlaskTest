@@ -39,6 +39,12 @@ function connectSocketInput(){
 			internalParams.camera.up.y = msg.up.y;
 			internalParams.camera.up.z = msg.up.z;
 		});
+		internalParams.socket.on('update_controls', function(msg) {
+			internalParams.controls.target.x = msg.target.x;
+			internalParams.controls.target.y = msg.target.y;
+			internalParams.controls.target.z = msg.target.z;
+
+		});
 	});
 }
 function drawSphere(){
