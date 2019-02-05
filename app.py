@@ -5,6 +5,12 @@ from threading import Lock
 import sys
 import numpy as np
 
+import json
+
+#some dummy data
+data = [{'foo': [1,2,3,4], 'fee': 'hello'}]
+data_json = json.dumps(data) 
+
 
 app = Flask(__name__)
 
@@ -53,6 +59,12 @@ def connection_test(message):
 	session['receive_count'] = session.get('receive_count', 0) + 1
 	emit('connection_response',{'data': message['data'], 'count': session['receive_count']})
 
+
+#sending data
+@socketio.on('input_data_request', namespace='/test')
+def input_data_request(message):
+	session['receive_count'] = session.get('receive_count', 0) + 1
+	emit('input_data_response',data_json)
 
 #will receive data from gui (and print to console as a test within "from_gui")
 @socketio.on('gui_input', namespace='/test')

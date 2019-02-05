@@ -8,6 +8,8 @@ function connectSocketOutput(){
 		// server is established.
 		internalParams.socket.on('connect', function() {
 			internalParams.socket.emit('connection_test', {data: 'I\'m connected!'});
+			//request data from server
+			internalParams.socket.emit('input_data_request', {data: 'requesting data'});
 		});
 		internalParams.socket.on('connection_response', function(msg) {
 			console.log(msg);
@@ -19,6 +21,9 @@ function connectSocketOutput(){
 		internalParams.socket.on('from_gui', function(msg) {
 			//console.log(msg);
 		});
+		internalParams.socket.on('input_data_response', function(msg) {
+			console.log("data received", msg);
+		});	
 	});
 }
 
